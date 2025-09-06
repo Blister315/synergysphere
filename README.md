@@ -1,2 +1,1 @@
-"# synergysphere" 
-"Deploy test" 
+
