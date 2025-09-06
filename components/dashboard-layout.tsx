@@ -116,7 +116,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="z-[9999] w-56">
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings">Profile Settings</Link>
               </DropdownMenuItem>
