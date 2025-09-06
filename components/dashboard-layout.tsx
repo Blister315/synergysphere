@@ -43,12 +43,13 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
 
   // ✅ Correct hrefs
   const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Projects", href: "/projects", icon: FolderOpen },
-    { name: "My Tasks", href: "/tasks", icon: CheckSquare },
-    { name: "Team", href: "/team", icon: Users },
-    { name: "Settings", href: "/settings", icon: Settings },
-  ]
+  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Projects", href: "/dashboard/projects", icon: FolderOpen },
+  { name: "My Tasks", href: "/dashboard/tasks", icon: CheckSquare },
+  { name: "Team", href: "/dashboard/team", icon: Users },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+]
+
 
   return (
     <div className="min-h-screen bg-gray-50">
