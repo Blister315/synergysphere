@@ -31,124 +31,98 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, user }: DashboardLayoutProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
+  const supabase = createClient()
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-  const handleSignOut = async () => {
-    const supabase = createClient()
+  const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push("/")
   }
 
-  const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Projects", href: "/dashboard/projects", icon: FolderOpen },
-    { name: "My Tasks", href: "/dashboard/tasks", icon: CheckSquare },
-    { name: "Team", href: "/dashboard/team", icon: Users },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  const navItems = [
+    { href: "/dashboard", label: "Dashboard", icon: Home },
+    { href: "/projects", label: "Projects", icon: FolderOpen },
+    { href: "/tasks", label: "My Tasks", icon: CheckSquare },
+    { href: "/team", label: "Team", icon: Users },
+    { href: "/settings", label: "Settings", icon: Settings },
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar backdrop */}
-      {isSidebarOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)}>
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
-        </div>
-      )}
-
+    <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+      <aside
+        className={`${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-y-0 left-0 z-30 w-64 transform bg-white border-r shadow-lg transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 flex flex-col`}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600"></div>
-            <span className="text-xl font-bold text-gray-900">SynergySphere</span>
-          </div>
-          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsSidebarOpen(false)}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <nav className="mt-6 px-3">
-          <div className="space-y-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
+        {/* Top Section */}
+        <div className="flex-1 flex flex-col">
+          <div className="p-4 text-xl font-bold">SynergySphere</div>
+          <nav className="flex-1 space-y-1 px-2">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const active = pathname.startsWith(item.href)
               return (
                 <Link
-                  key={item.name}
+                  key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+                    active ? "bg-blue-50 text-blue-600" : "text-gray-700 hover:bg-gray-100"
                   }`}
-                  onClick={() => setIsSidebarOpen(false)}
                 >
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
+                  <Icon className="w-5 h-5" />
+                  {item.label}
                 </Link>
               )
             })}
-          </div>
-        </nav>
+          </nav>
+        </div>
 
-        {/* User profile section */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
+        {/* Bottom Section - Profile */}
+        <div className="p-4 border-t">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.avatar_url || "/placeholder.svg"} />
-                  <AvatarFallback className="bg-blue-100 text-blue-700">
-                    {user.display_name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
-                  </AvatarFallback>
+              <div className="flex items-center gap-3 cursor-pointer">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={user.avatar_url || ""} />
+                  <AvatarFallback>{user.display_name[0]}</AvatarFallback>
                 </Avatar>
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-gray-900">{user.display_name || "User"}</p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <div>
+                  <p className="font-medium">{user.display_name}</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
-              </Button>
+              </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">Profile Settings</Link>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuItem onClick={() => router.push("/settings")}>
+                Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
-                Sign Out
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-      </div>
+      </aside>
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setIsSidebarOpen(true)}>
-                <Menu className="h-5 w-5" />
-              </Button>
-              <h1 className="text-lg font-semibold text-gray-900">
-                {navigation.find((item) => item.href === pathname)?.name || "Dashboard"}
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <NotificationsDropdown />
-            </div>
-          </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Top bar */}
+        <header className="flex items-center justify-between p-4 border-b bg-white">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+          <NotificationsDropdown />
         </header>
 
-        {/* Page content */}
-        <main className="p-4 sm:p-6">{children}</main>
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   )
