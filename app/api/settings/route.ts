@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server"; // ✅ FIXED PATH
+import { createClient } from "@/lib/supabase/server";
 
 // GET user settings
 export async function GET() {
