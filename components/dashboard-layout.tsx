@@ -41,12 +41,13 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
     router.push("/")
   }
 
+  // ✅ Correct hrefs
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Projects", href: "/dashboard/projects", icon: FolderOpen },
-    { name: "My Tasks", href: "/dashboard/tasks", icon: CheckSquare },
-    { name: "Team", href: "/dashboard/team", icon: Users },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    { name: "Projects", href: "/projects", icon: FolderOpen },
+    { name: "My Tasks", href: "/tasks", icon: CheckSquare },
+    { name: "Team", href: "/team", icon: Users },
+    { name: "Settings", href: "/settings", icon: Settings },
   ]
 
   return (
@@ -60,10 +61,9 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}
       >
+        {/* Logo + close button */}
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600"></div>
@@ -74,7 +74,8 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
           </Button>
         </div>
 
-        <nav className="mt-6 px-3">
+        {/* Navigation */}
+        <nav className="mt-6 flex-1 px-3">
           <div className="space-y-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href
@@ -97,8 +98,8 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
           </div>
         </nav>
 
-        {/* User profile section */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
+        {/* User profile section at bottom */}
+        <div className="p-4 border-t">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3">
@@ -116,7 +117,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">Profile Settings</Link>
+                <Link href="/settings">Profile Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
