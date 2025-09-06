@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -38,18 +37,17 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
   const handleSignOut = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push("/")
+    router.push("/login") // ✅ redirect to login after logout
   }
 
-  // ✅ Correct hrefs
+  // ✅ Navigation links
   const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Projects", href: "/dashboard/projects", icon: FolderOpen },
-  { name: "My Tasks", href: "/dashboard/tasks", icon: CheckSquare },
-  { name: "Team", href: "/dashboard/team", icon: Users },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
-]
-
+    { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Projects", href: "/dashboard/projects", icon: FolderOpen },
+    { name: "My Tasks", href: "/dashboard/tasks", icon: CheckSquare },
+    { name: "Team", href: "/dashboard/team", icon: Users },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  ]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -62,7 +60,9 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
+        lg:translate-x-0 lg:static lg:inset-0`}
       >
         {/* Logo + close button */}
         <div className="flex items-center justify-between h-16 px-6 border-b">
@@ -103,25 +103,28 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
         <div className="p-4 border-t">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.avatar_url || "/placeholder.svg"} />
-                  <AvatarFallback className="bg-blue-100 text-blue-700">
-                    {user.display_name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-gray-900">{user.display_name || "User"}</p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                </div>
-              </Button>
+              <div className="w-full">
+                <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.avatar_url || "/placeholder.svg"} />
+                    <AvatarFallback className="bg-blue-100 text-blue-700">
+                      {user.display_name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-medium text-gray-900">{user.display_name || "User"}</p>
+                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                  </div>
+                </Button>
+              </div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="z-[9999] w-56">
+
+            <DropdownMenuContent side="top" align="start" className="z-[9999] w-56 bg-white">
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings">Profile Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+              <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-700">
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
