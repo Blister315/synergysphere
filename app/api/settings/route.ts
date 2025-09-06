@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server"; // ✅ use V0’s Supabase helper
+import { createClient } from "@/lib/supabase/server"; // ✅ FIXED PATH
 
 // GET user settings
-export async function GET(req: Request) {
+export async function GET() {
   const supabase = createClient();
 
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -34,7 +34,7 @@ export async function PUT(req: Request) {
   const body = await req.json();
   const { name, email, password, notifications } = body;
 
-  const updates: any = {};
+  const updates: Record<string, any> = {};
   if (name) updates.name = name;
   if (typeof notifications === "boolean") updates.notifications = notifications;
 
@@ -47,15 +47,19 @@ export async function PUT(req: Request) {
   }
 
   // Update user profile
-  const { data, error } = await supabase
-    .from("users")
-    .update(updates)
-    .eq("id", user.id)
-    .select();
+  if (Object.keys(updates).length > 0) {
+    const { data, error } = await supabase
+      .from("users")
+      .update(updates)
+      .eq("id", user.id)
+      .select();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data[0]);
   }
 
-  return NextResponse.json(data[0]);
+  return NextResponse.json({ success: true });
 }
