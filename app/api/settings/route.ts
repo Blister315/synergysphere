@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic"; // ⛔ prevent build-time prerendering
+
 // GET user settings
 export async function GET() {
   const supabase = createClient();
