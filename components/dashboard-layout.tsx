@@ -118,7 +118,7 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem asChild>
-                <Link href="/settings">Profile Settings</Link>
+                <Link href="/dashboard/settings">Profile Settings</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
