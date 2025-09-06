@@ -1,137 +1,104 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { supabase } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useRouter } from "next/navigation"
-import { Upload } from "lucide-react"
+import { Plus } from "lucide-react"
 
-interface CreateProjectDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  userId: string
-}
-
-export function CreateProjectDialog({ open, onOpenChange, userId }: CreateProjectDialogProps) {
+export function CreateProjectDialog({ userId }: { userId: string }) {
+  const [open, setOpen] = useState(false)
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
-  const [imageUrl, setImageUrl] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     if (!name.trim()) return
+    setLoading(true)
 
-    setIsLoading(true)
-    setError(null)
+    const { data, error } = await supabase
+      .from("projects")
+      .insert({
+        name: name.trim(),
+        description: description.trim() || null,
+        created_by: userId,
+      })
+      .select()
+      .single()
 
-    try {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from("projects")
-        .insert({
-          name: name.trim(),
-          description: description.trim() || null,
-          image_url: imageUrl.trim() || null,
-          created_by: userId,
-        })
-        .select()
-        .single()
+    setLoading(false)
 
-      if (error) throw error
-
-      // Reset form
+    if (error) {
+      console.error(error)
+    } else {
       setName("")
       setDescription("")
-      setImageUrl("")
-      onOpenChange(false)
-
-      // Refresh the page to show new project
-      router.refresh()
-    } catch (error: any) {
-      setError(error.message || "Failed to create project")
-    } finally {
-      setIsLoading(false)
+      setOpen(false)
     }
   }
 
   const handleCancel = () => {
     setName("")
     setDescription("")
-    setImageUrl("")
-    setError(null)
-    onOpenChange(false)
+    setOpen(false)
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          New Project
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>Start a new project and invite your team members to collaborate.</DialogDescription>
+          <DialogDescription>
+            Enter the details for your new project
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Project Name *</Label>
-              <Input
-                id="name"
-                placeholder="Enter project name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Describe your project..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="image">Project Image URL</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="image"
-                  placeholder="https://example.com/image.jpg"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                />
-                <Button type="button" variant="outline" size="icon">
-                  <Upload className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            {error && <p className="text-sm text-red-500">{error}</p>}
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Project Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="My Awesome Project"
+            />
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading || !name.trim()}>
-              {isLoading ? "Creating..." : "Create Project"}
-            </Button>
-          </DialogFooter>
-        </form>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe your project"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 mt-4">
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={loading}>
+            {loading ? "Creating..." : "Create"}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   )
