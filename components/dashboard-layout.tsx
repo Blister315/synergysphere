@@ -100,34 +100,34 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
         </nav>
 
         {/* User profile section at bottom */}
-        {/* User profile section at bottom */}
-<div className="p-4 border-t">
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={user.avatar_url || "/placeholder.svg"} />
-          <AvatarFallback className="bg-blue-100 text-blue-700">
-            {user.display_name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1 text-left">
-          <p className="text-sm font-medium text-gray-900">{user.display_name || "User"}</p>
-          <p className="text-xs text-gray-500 truncate">{user.email}</p>
+        <div className="p-4 border-t">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="w-full justify-start gap-3 h-auto p-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.avatar_url || "/placeholder.svg"} />
+                  <AvatarFallback className="bg-blue-100 text-blue-700">
+                    {user.display_name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-medium text-gray-900">{user.display_name || "User"}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem asChild>
+                <Link href="/settings">Profile Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="z-[9999] w-56">
-      <DropdownMenuItem asChild>
-        <Link href="/dashboard/settings">Profile Settings</Link>
-      </DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={handleSignOut} className="text-red-600">
-        Sign Out
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-</div>
+      </div>
 
       {/* Main content */}
       <div className="lg:pl-64">
